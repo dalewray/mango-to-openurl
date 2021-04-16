@@ -21,13 +21,23 @@ const
 const readFile = path.join(__dirname, inputFileName);
 const writeFile = path.join(__dirname, outputFileName);
 
-
 const fileContent = fs.createReadStream(readFile);
+fileContent.on('error', function(){  
+  console.log('No input file found, check config.json:inputFileName');
+});
 
 const writeStream = fs.createWriteStream(writeFile);
+writeStream.on('error', function(){  
+  console.log('Cannot write to output file, check config.json:outputFileName');
+});
+
 let parseParams = {columns: true, bom: true};
 if (test) parseParams.to_line = 10;
 const parser = csv.parse(parseParams);
+
+parser.on('error', function(err){
+  console.error('CSV parse error: ', err.message);
+})
 
 const transformer = csv.transform(async (row, cb) => {
   // limit rate so we don't get rejects or banned
@@ -80,7 +90,14 @@ const transformer = csv.transform(async (row, cb) => {
   cb(null, row);
 });
 
+transformer.on('error', function(err){
+  console.error('CSV transform error: ', err.message);
+});
+
 const stringify = csv.stringify({ header: true });
+stringify.on('error', function(err){
+  console.error('CSV convert error: ', err.message);
+});
 
 fileContent.pipe(parser).pipe(transformer).pipe(stringify).pipe(writeStream);
 
