@@ -1,0 +1,9 @@
+{
+  "test": true,
+  "rateLimit": 500,
+  "oldStemUrl": "https://ucf.catalog.fcla.edu/permalink",
+  "newStemUrl": "https://ucf-flvc.primo.exlibrisgroup.com/discovery/openurl?institution=01FALSC_UCF",
+  "openUrlVid": "01FALSC_UCF:UCF",
+  "inputFileName": "assets_list.csv",
+  "outputFileName": "new_url_list.csv"
+}

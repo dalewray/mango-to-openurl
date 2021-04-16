@@ -1,0 +1,20 @@
+{
+  "name": "mango-to-openurl",
+  "version": "1.0.0",
+  "description": "Tool to convert permalinks from Mango to OpenURL via Springshare exports",
+  "main": "src/stream.js",
+  "homepage": "",
+  "license": "MIT",
+  "email": "dalewray@gmail.com",
+  "url": "https://github.com/dalewray/",
+  "scripts": {
+    "prod": "yarn node stream.js false",
+    "test": "yarn node stream.js true",
+    "log": "yarn node stream.js true > log.txt"
+  },
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.6",
+    "csv": "^5.5.0",
+    "follow-redirects": "^1.13.3"
+  }
+}
