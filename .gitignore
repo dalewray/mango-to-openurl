@@ -8,3 +8,5 @@
 
 *.csv
 log.txt
+.vscode/
+.yarn/sdks/

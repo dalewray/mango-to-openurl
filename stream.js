@@ -1,5 +1,4 @@
-
-const fs = require('fs');
+const fs = require('fs')
 const https = require('https');
 const path = require('path');
 
@@ -7,7 +6,6 @@ const cheerio = require('cheerio');
 const csv = require('csv');
 const http = require('follow-redirects').http;
 const config = require('./config.json');
-const { parse } = require('path');
 
 const 
   test = process.argv[8] || config.test || false,
@@ -16,7 +14,7 @@ const
   newStemUrl = process.argv[3] || config.newStemUrl,
   openUrlVid = process.argv[4] || config.openUrlVid,
   inputFileName = process.argv[5] || config.inputFileName,
-  outputFileName = process.argv[6] || config.outputFileName, 
+  outputFileName = process.argv[6] || config.outputFileName
 
 const readFile = path.join(__dirname, inputFileName);
 const writeFile = path.join(__dirname, outputFileName);
@@ -49,7 +47,7 @@ const transformer = csv.transform(async (row, cb) => {
   let isbn = '';
   
   if ((mangoUrl && mangoUrl.includes(oldStemUrl))) {
-    data = await makeRequest(mangoUrl);
+    let data = await makeRequest(mangoUrl);
     let data2 = {};
     let $ = await cheerio.load(data);
     // mango uses improper forwarding, need to pull out the new url and retrieve
@@ -126,6 +124,7 @@ const makeRequest = async function (url) {
         });
       });
       req.on('error', error => {
+        reject(error);
         console.error(error);
       })
 
