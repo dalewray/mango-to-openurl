@@ -17,7 +17,7 @@ const catalogReply = `
 </table></body></html>
 `;
 
-describe('Get Meta Forward', function() {
+describe('Get ISBN', function() {
     beforeEach(function() {
         nock('https://ucf.catalog.fcla.edu')
         .get('/permalink.jsp?29CF037571347')
@@ -28,10 +28,16 @@ describe('Get Meta Forward', function() {
         .reply(200, catalogReply);
     });
 
-    describe('Parsed Meta Forward', function() {
+    describe('get url data', function() {
         it('should follow meta redirect', async function() {
             assert.strictEqual('168263146X', 
                 await mangoISBN('https://ucf.catalog.fcla.edu/permalink.jsp?29CF037571347')
+            );
+        });
+
+        it('should handle no redirect', async function() {
+            assert.strictEqual('168263146X', 
+                await mangoISBN('http://ucf.catalog.fcla.edu/?st=CF038054365&ix=pm&I=0&V=D&pm=1&fl=ba')
             );
         });
     });

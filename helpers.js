@@ -46,15 +46,17 @@ exports.makeRequest = async function (url) {
     let data2 = {};
     let $ = cheerio.load(data);
     // mango uses improper forwarding, need to pull out the new url and retrieve
-    let forward = $("meta").attr("content").substring('0; URL'.length + 1);
-    if (forward) {
-      data2 = await exports.makeRequest(forward);
+    let forward = $("meta").attr("content") || ''
+    let url = forward.substring('0; URL'.length + 1);
+
+    console.log('url', url);
+    if (url) {
+      data2 = await exports.makeRequest(url);
     } else {
       data2 = data; // attempt to recover if mango returns a good forward
     }
     $ = cheerio.load(data2);
 
     let isbn = $('#ISBN').first().text();
-    console.log('isbn', isbn);
     return isbn;
   };
