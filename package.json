@@ -8,10 +8,11 @@
   "email": "dalewray@gmail.com",
   "url": "https://github.com/dalewray/",
   "scripts": {
-    "prod": "yarn node stream.js false",
-    "test": "yarn node stream.js true",
+    "prod": "yarn node stream.js --short=false",
+    "short": "yarn node stream.js --short=true",
     "log": "yarn node stream.js true > log.txt",
-    "lint": "yarn eslint ."
+    "lint": "yarn eslint .",
+    "test": "yarn mocha"
   },
   "dependencies": {
     "cheerio": "^1.0.0-rc.6",
@@ -21,9 +22,12 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^4.2.1",
     "follow-redirects": "^1.13.3",
+    "minimist": "^1.2.5",
     "yarn": "^1.22.10"
   },
   "devDependencies": {
-    "eslint": "^7.12.1"
+    "eslint": "^7.12.1",
+    "mocha": "^8.3.2",
+    "nock": "^13.0.11"
   }
 }

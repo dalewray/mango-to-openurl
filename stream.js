@@ -1,20 +1,19 @@
 const fs = require('fs')
-const https = require('https');
 const path = require('path');
-
-const cheerio = require('cheerio');
 const csv = require('csv');
-const http = require('follow-redirects').http;
+
 const config = require('./config.json');
+const helpers = require('./helpers');
+const argv = require('minimist')(process.argv);
 
 const 
-  test = process.argv[8] || config.test || false,
-  rateLimit = process.argv[7] || config.rateLimit,
-  oldStemUrl = process.argv[2] || config.oldStemUrl,
-  newStemUrl = process.argv[3] || config.newStemUrl,
-  openUrlVid = process.argv[4] || config.openUrlVid,
-  inputFileName = process.argv[5] || config.inputFileName,
-  outputFileName = process.argv[6] || config.outputFileName
+  short = argv.short || config.short || false,
+  rateLimit = argv.rateLimit || config.rateLimit,
+  oldStemUrl = argv.oldStemUrl|| config.oldStemUrl,
+  newStemUrl = argv.newStemUrl || config.newStemUrl,
+  openUrlVid = argv.openUrlVid || config.openUrlVid,
+  inputFileName = argv.inputFileName || config.inputFileName,
+  outputFileName = argv.outputFileName|| config.outputFileName
 
 const readFile = path.join(__dirname, inputFileName);
 const writeFile = path.join(__dirname, outputFileName);
@@ -30,7 +29,7 @@ writeStream.on('error', function(){
 });
 
 let parseParams = {columns: true, bom: true};
-if (test) parseParams.to_line = 10;
+if (short) parseParams.to_line = 3;
 const parser = csv.parse(parseParams);
 
 parser.on('error', function(err){
@@ -47,18 +46,7 @@ const transformer = csv.transform(async (row, cb) => {
   let isbn = '';
   
   if ((mangoUrl && mangoUrl.includes(oldStemUrl))) {
-    let data = await makeRequest(mangoUrl);
-    let data2 = {};
-    let $ = await cheerio.load(data);
-    // mango uses improper forwarding, need to pull out the new url and retrieve
-    let forward = $("meta").attr("content").substring('0; URL'.length + 1);
-    if (forward) {
-      data2 = await makeRequest(forward);
-    } else {
-      data2 = data; // attempt to recover if mango returned a good forward
-    }
-    $ = await cheerio.load(data2);
-    isbn = $('#ISBN').text();
+    isbn = helpers.mangoISBN(mangoUrl);
   }
 
   let openFormatUrl = openUrlFormat;
@@ -97,7 +85,6 @@ stringify.on('error', function(err){
   console.error('CSV convert error: ', err.message);
 });
 
-fileContent.pipe(parser).pipe(transformer).pipe(stringify).pipe(writeStream);
 
 const openUrlFormat = {
   "&vid=": openUrlVid,
@@ -109,42 +96,4 @@ const openUrlFormat = {
   "&rft.isbn=": ""
 };
 
-
-const makeRequest = async function (url) {
-  return new Promise((resolve, reject) => {
-    let body = '';
-    if (url.includes('https')) {
-      const req = https.request(new URL(url), res => {
-        res.on('data', function (chunk) {
-          body += chunk;
-        });
-
-        res.on('end', () => {
-          resolve(body);
-        });
-      });
-      req.on('error', error => {
-        reject(error);
-        console.error(error);
-      })
-
-      req.end();
-    } else {
-      const req = http.request(new URL(url), res => {
-        res.on('data', function (chunk) {
-          body += chunk;
-        });
-
-        res.on('end', () => {
-          resolve(body);
-        });
-        req.on('error', error => {
-          console.error(error);
-        })
-      });
-      req.end();
-
-    }
-
-  })
-}
+fileContent.pipe(parser).pipe(transformer).pipe(stringify).pipe(writeStream);
