@@ -41,36 +41,21 @@ const transformer = csv.transform(async (row, cb) => {
   parser.pause();
   setTimeout(() => {parser.resume()}, rateLimit);
 
-  let mangoUrl = row.URL;
   let mangoTitle = row.Name;
-  let isbn = '';
-  
-  if ((mangoUrl && mangoUrl.includes(oldStemUrl))) {
-    isbn = helpers.mangoISBN(mangoUrl);
-  }
+  let mangoUrl, isbn = '';
 
-  let openFormatUrl = openUrlFormat;
-  openFormatUrl["&rft.btitle="] = encodeURI(mangoTitle);
-  if (isbn) openFormatUrl["&rft.isbn="] = isbn;
+  if (row.URL.includes(oldStemUrl)) { mangoUrl = row.URL; }
+  if (mangoUrl) isbn = helpers.mangoISBN(mangoUrl);
 
-  let newOpenFormatUrl = newStemUrl;
-  
-  if (mangoUrl === '' || mangoUrl.includes(oldStemUrl)) {
-    for (const [key, value] of Object.entries(openFormatUrl)) {
-      newOpenFormatUrl = newOpenFormatUrl + key + value
-    }
-    console.log(`Changed ${row.ID} URL to: `, newOpenFormatUrl);
+  let openUrl = helpers.replaceUrl(isbn, mangoTitle, 
+    newStemUrl, openUrlVid);
+
+  if (isbn ) {
+    row.URL = openUrl; 
+    console.log(`Changed ${row.ID} URL to: `, openUrl);
   } else {
-    newOpenFormatUrl = mangoUrl;
-    console.log('Did not change URL for record ', row.ID);
-  }
-
-  if (!mangoUrl) {
-    row.SuggestedUrl = newOpenFormatUrl;
+    row.SuggestedUrl = openUrl;
     console.log('Attempting new open url based on title');
-  } else {
-    row.URL = newOpenFormatUrl;
-    row.SuggestedUrl = '';
   }
 
   cb(null, row);
@@ -86,14 +71,5 @@ stringify.on('error', function(err){
 });
 
 
-const openUrlFormat = {
-  "&vid=": openUrlVid,
-  "&ctx_ver=": "Z39.88-2004",
-  "&rft.genre=": "book",
-  "&ctx_enc=": "info:ofi%2Fenc:UTF-8",
-  "&url_ver=": "Z39.88-2004",
-  "&url_ctx_fmt=": "infofi%2Ffmt:kev:mtx:ctx",
-  "&rft.isbn=": ""
-};
 
 fileContent.pipe(parser).pipe(transformer).pipe(stringify).pipe(writeStream);
