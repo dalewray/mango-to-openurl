@@ -9,11 +9,11 @@ const argv = require('minimist')(process.argv);
 const 
   short = argv.short || config.short || false,
   rateLimit = argv.rateLimit || config.rateLimit,
-  oldStemUrl = argv.oldStemUrl|| config.oldStemUrl,
+  oldStemUrl = argv.oldStemUrl || config.oldStemUrl,
   newStemUrl = argv.newStemUrl || config.newStemUrl,
   openUrlVid = argv.openUrlVid || config.openUrlVid,
   inputFileName = argv.inputFileName || config.inputFileName,
-  outputFileName = argv.outputFileName|| config.outputFileName
+  outputFileName = argv.outputFileName || config.outputFileName
 
 const readFile = path.join(__dirname, inputFileName);
 const writeFile = path.join(__dirname, outputFileName);
@@ -31,10 +31,9 @@ writeStream.on('error', function(){
 let parseParams = {columns: true, bom: true};
 if (short) parseParams.to_line = 3;
 const parser = csv.parse(parseParams);
-
 parser.on('error', function(err){
   console.error('CSV parse error: ', err.message);
-})
+});
 
 const transformer = csv.transform(async (row, cb) => {
   // limit rate so we don't get rejects or banned
@@ -47,8 +46,7 @@ const transformer = csv.transform(async (row, cb) => {
   if (row.URL.includes(oldStemUrl)) { mangoUrl = row.URL; }
   if (mangoUrl) isbn = helpers.mangoISBN(mangoUrl);
 
-  let openUrl = helpers.replaceUrl(isbn, mangoTitle, 
-    newStemUrl, openUrlVid);
+  let openUrl = helpers.replaceUrl(isbn, mangoTitle, newStemUrl, openUrlVid);
 
   if (isbn ) {
     row.URL = openUrl; 
@@ -60,7 +58,6 @@ const transformer = csv.transform(async (row, cb) => {
 
   cb(null, row);
 });
-
 transformer.on('error', function(err){
   console.error('CSV transform error: ', err.message);
 });
@@ -69,7 +66,5 @@ const stringify = csv.stringify({ header: true });
 stringify.on('error', function(err){
   console.error('CSV convert error: ', err.message);
 });
-
-
 
 fileContent.pipe(parser).pipe(transformer).pipe(stringify).pipe(writeStream);
