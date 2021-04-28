@@ -1,10 +1,8 @@
 const nock = require('nock');
 const assert = require('assert');
 const { mangoISBN, replaceUrl } = require('../helpers');
-const transformer = require('../stream.js');
 const { refreshReply, catalogReply,
-    isbn, title, ucfUrl, openUrlVid,
-    preRow1, postRow1
+    isbn, title, ucfUrl, openUrlVid
 } = require('./data');
 
 

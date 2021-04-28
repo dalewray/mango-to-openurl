@@ -1,7 +1,9 @@
 # mango-to-openurl
 
-Options are available in config.json or may be passed via the command line.
 
+This script is designed to convert permalinks from a library catalog using the Mango Platform to permalinks formatted in the OpenURL standard.  It is specifically written to convert permalinks used in SpringShare’s LibGuides link assets.
+Options are available in config.json or may be passed via the command line.
+\
 `yarn prod` will run with options in config.json
 `yarn test` will run only the first 10 records
 `yarn log` will run yarn prod and save standard output to log.txt
